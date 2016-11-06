@@ -23,15 +23,19 @@ public class MainActivity extends Activity {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
 
+            Log.i(TAG, "ServiceConnection.onServiceConnected() >>>");
             MyService.MyBinder binder = (MyService.MyBinder) iBinder;
             mService = binder.getService();
             mBound = true;
+            Log.i(TAG, "ServiceConnection.onServiceConnected() <<<");
         }
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
 
+            Log.i(TAG, "ServiceConnection.onServiceDisconnected() >>>");
             mBound = false;
+            Log.i(TAG, "ServiceConnection.onServiceDisconnected() <<<");
         }
     };
 
