@@ -110,11 +110,11 @@ public class WifiHelper {
                     case CONNECTING:
                         break;
                     case CONNECTED:
-                        // SSIDがカメラなら次へ
+                        // SSIDが指定アクセスポイントなら次へ
                         WifiInfo info = mWifiManager.getConnectionInfo();
                         String ssid = info.getSSID();
 
-                        if (ssid.matches(".*DSC-QX10.*")) {
+                        if (ssid.matches(".*" + mAccessPointName + ".*")) {
 
                             mContext.unregisterReceiver(mReconnectReceiver);
                             mHandler.sendEmptyMessage(STATE_SEARCH_DEVICES);
@@ -155,6 +155,8 @@ public class WifiHelper {
      */
     public void connect(String accessPointName) {
 
+        Log.i(TAG, "connect() >>>");
+
         mAccessPointName = accessPointName;
 
         // wifiはONになっているか？
@@ -171,12 +173,16 @@ public class WifiHelper {
             // アクセスポイントを探す
             mHandler.sendEmptyMessage(STATE_WIFI_ON);
         }
+
+        Log.i(TAG, "connect() <<<");
     }
 
     /**
      * アクセスポイントを探す
      */
     private void checkAccessPoint() {
+
+        Log.i(TAG, "checkAccessPoint() >>>");
 
         // 現在接続しているSSIDを確認する
         WifiInfo info = mWifiManager.getConnectionInfo();
@@ -190,12 +196,16 @@ public class WifiHelper {
         else {
 
         }
+
+        Log.i(TAG, "checkAccessPoint() <<<");
     }
 
     /**
      * アクセスポイントを検索
      */
     private void scanAccessPoint() {
+
+        Log.i(TAG, "scanAccessPoint() >>>");
 
         // スキャン結果の受信を準備
         IntentFilter filter = new IntentFilter();
@@ -204,6 +214,8 @@ public class WifiHelper {
 
         // APスキャンを開始する
         mWifiManager.startScan();
+
+        Log.i(TAG, "scanAccessPoint() <<<");
     }
 
     /**
@@ -211,9 +223,11 @@ public class WifiHelper {
      */
     private void connectAccessPoint() {
 
+        Log.i(TAG, "connectAccessPoint() >>>");
+
         // スキャン結果を取得
         List<ScanResult> apLists = mWifiManager.getScanResults();
-        boolean foundCamera = false;
+        boolean found = false;
 
         for (ScanResult result : apLists) {
 
@@ -236,7 +250,7 @@ public class WifiHelper {
                             mWifiManager.enableNetwork(tmp.networkId, false);
                         }
 
-                        foundCamera = true;
+                        found = true;
                         mWifiManager.enableNetwork(config.networkId, true);
                         break;
                     }
@@ -246,17 +260,26 @@ public class WifiHelper {
             }
         }
 
-        if (!foundCamera) {
+        if (!found) {
 
 //            Log.d(Consts.TAG, "camera failed.");
 //            setText("カメラが見つかりませんでした\n");
+
+            mHandler.sendEmptyMessage(STATE_SCAN_AP);
         }
+        else {
+            Log.i(TAG, "見つかりました");
+        }
+
+        Log.i(TAG, "connectAccessPoint() <<<");
     }
 
     /**
      * アクセスポイントを戻す
      */
-    private void restoreAccessPoint() {
+    public void restoreAccessPoint() {
+
+        Log.i(TAG, "restoreAccessPoint() >>>");
 
         if (mInitialSsid != null && !mInitialSsid.isEmpty()) {
 
@@ -271,5 +294,7 @@ public class WifiHelper {
                 }
             }
         }
+
+        Log.i(TAG, "restoreAccessPoint() <<<");
     }
 }

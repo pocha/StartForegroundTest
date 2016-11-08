@@ -14,12 +14,13 @@ public class MyService extends Service {
 
     private static final String TAG = MyService.class.getSimpleName();
     private static boolean mStarted = false;
-
-    private final IBinder mBinder = new MyBinder();
-
     public static boolean isStarted() {
         return mStarted;
     }
+
+    private final IBinder mBinder = new MyBinder();
+
+    private WifiHelper mWifiHelper;
 
     public class MyBinder extends Binder {
         MyService getService() {
@@ -74,5 +75,34 @@ public class MyService extends Service {
         Log.i(TAG, "onBind() >>>");
         Log.i(TAG, "onBind() <<<");
         return mBinder;
+    }
+
+    /**
+     *
+     * @param apName
+     */
+    public void start(String apName) {
+
+        Log.i(TAG, "start() >>>");
+        Log.i(TAG, "apName = " + apName);
+
+        mWifiHelper = new WifiHelper(this);
+        mWifiHelper.connect(apName);
+
+        Log.i(TAG, "start() <<<");
+    }
+
+    /**
+     *
+     */
+    public void stop() {
+
+        Log.i(TAG, "stop() >>>");
+
+        if (mWifiHelper != null) {
+            mWifiHelper.restoreAccessPoint();
+        }
+
+        Log.i(TAG, "stop() <<<");
     }
 }

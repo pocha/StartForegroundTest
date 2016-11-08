@@ -11,12 +11,14 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.View;
+import android.widget.Button;
 
 public class MainActivity extends Activity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    private MyService mService;
+    private MyService mService = null;
     private boolean mBound = false;
 
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -34,6 +36,7 @@ public class MainActivity extends Activity {
         public void onServiceDisconnected(ComponentName componentName) {
 
             Log.i(TAG, "ServiceConnection.onServiceDisconnected() >>>");
+            mService = null;
             mBound = false;
             Log.i(TAG, "ServiceConnection.onServiceDisconnected() <<<");
         }
@@ -48,6 +51,28 @@ public class MainActivity extends Activity {
 //        if (!MyService.isStarted()) {
 //            startService(new Intent(this, MyService.class));
 //        }
+
+        Button button = (Button) findViewById(R.id.button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if (mService != null) {
+                    mService.start("SENSOR-76762");
+                }
+            }
+        });
+
+        button = (Button) findViewById(R.id.button2);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if (mService != null) {
+                    mService.stop();
+                }
+            }
+        });
 
         Log.i(TAG, "onCreate() <<<");
     }
@@ -68,11 +93,9 @@ public class MainActivity extends Activity {
 
             startService(new Intent(this, MyService.class));
         }
-        else {
 
-            Intent intent = new Intent(this, MyService.class);
-            bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-        }
+        Intent intent = new Intent(this, MyService.class);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 
         Log.i(TAG, "onStart() <<<");
     }
